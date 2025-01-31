@@ -3,12 +3,12 @@ import { eq } from "drizzle-orm"
 import { categories } from "@/app/lib/db/schema"
 import { db } from "@/app/lib/db"
 
-export async function GET(req: Request, { params }: { params: { id: number } }) {
+export async function GET(req: Request, { params }: { params: Record<string, string> }) {
   try {
     const category = await db
       .select()
       .from(categories)
-      .where(eq(categories.id, params.id))
+      .where(eq(categories.id, Number(params.id))) 
     return NextResponse.json(category[0]) 
   } catch (error) {
     console.log(error)
@@ -19,13 +19,13 @@ export async function GET(req: Request, { params }: { params: { id: number } }) 
   }
 }
 
-export async function PUT(req: Request, { params }: { params: { id: number } }) {
+export async function PUT(req: Request, { params }: { params: Record<string, string> }) {
   try {
     const { name, image } = await req.json()
     await db
       .update(categories)
       .set({ name, image })
-      .where(eq(categories.id, params.id))
+      .where(eq(categories.id, Number(params.id)))  
     return NextResponse.json({ message: "Category updated" })
   } catch (error) {
     console.log(error)
@@ -36,15 +36,11 @@ export async function PUT(req: Request, { params }: { params: { id: number } }) 
   }
 }
 
-
-
-export async function DELETE(req: Request, { params }: { params: { id: number } }) {
+export async function DELETE(req: Request, { params }: { params: Record<string, string> }) {
   try {
-    
     await db
       .delete(categories)
-      .where(eq(categories.id, params.id));
-
+      .where(eq(categories.id, Number(params.id)))  
     return NextResponse.json({ message: "Category deleted successfully" });
   } catch (error) {
     console.log(error);
