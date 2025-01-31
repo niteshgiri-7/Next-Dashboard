@@ -17,8 +17,9 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useEffect, useState } from "react"
-import { Loader2 } from "lucide-react"
+import { ArrowLeft, Loader2 } from "lucide-react"
 import { toast } from "sonner"
+import Link from "next/link"
 
 const formSchema = z.object({
     name: z.string().min(2, {
@@ -79,7 +80,12 @@ export default function EditCategoryPage() {
         <>
             {!isLoading ?
                 <div className="p-6 w-[30%] mx-auto">
-                    <h1 className="text-2xl font-bold mb-6">Edit Category</h1>
+                    <div>
+                        <Link href="/products">
+                            <ArrowLeft />
+                        </Link>
+                        <h1 className="text-2xl font-bold mb-6">Edit Product</h1>
+                    </div>
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                             <FormField

@@ -43,12 +43,11 @@ export default function EditProductPage() {
     return res.json()
   }
 
-
   const populateForm = async () => {
     setIsLoading(true)
     try {
       const product = await fetchProduct()
-      form.reset(product) 
+      form.reset(product)
     } catch (error) {
       toast.error("Failed to load product data")
       console.log(error)
@@ -61,7 +60,7 @@ export default function EditProductPage() {
     populateForm()
   }, [id])
 
-  const onSubmit = async (data: ProductType) => {
+  const onSubmit = async (data: Omit<ProductType, "id" | "categoryId" | "categoryName">) => {
     try {
       const res = await fetch(`/api/products/${id}`, {
         method: "PUT",
@@ -72,49 +71,111 @@ export default function EditProductPage() {
       toast.success("Product Updated Successfully!")
       router.push("/products")
     } catch (error) {
+      console.log(error)
       toast.error("Failed to update product")
     }
   }
 
+
   return (
-    <div className="p-6 w-[30%] mx-auto">
-        <div>
-      <Link href='/products'><ArrowLeft /></Link>
-      <h1 className="text-2xl font-bold mb-6 mt-2">Add New Category</h1>
-      </div>
-      {isLoading ? (
-        <div className="h-screen w-full flex justify-center items-center">
-          <Loader2 className="h-24 w-24 animate-spin" />
-        </div>
-      ) : (
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            {["name", "description", "image", "initialStock", "inStock"].map((field) => (
+    <>
+      {!isLoading ?
+        <div className="p-6 w-[30%] mx-auto">
+          <div>
+          <Link href="/products">
+            <ArrowLeft />
+          </Link>
+            <h1 className="text-2xl font-bold mb-6">Edit Product</h1>
+          </div>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
-                key={field}
                 control={form.control}
-                name={field}
-                render={({ field: formField }) => (
+                name="name"
+                render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{field.charAt(0).toUpperCase() + field.slice(1)}</FormLabel>
+                    <FormLabel>Name</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder={`Enter ${field}`}
-                        {...formField}
-                        type={field.includes("Stock") ? "number" : "text"}
-                      />
+                      <Input placeholder="Category Name" {...field} />
                     </FormControl>
-                    <FormDescription>This is the {field} of the product.</FormDescription>
+                    <FormDescription>
+                      This is the name of the category. Keep it short and clear.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            ))}
-          
-            <Button type="submit">Update Product</Button>
-          </form>
-        </Form>
-      )}
-    </div>
+              <FormField
+                control={form.control}
+                name="image"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Image URL</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Image URL" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Provide a valid URL for the image you want to associate with this category.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter Description" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Provide a description of the product
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+       <FormField
+                control={form.control}
+                name="initialStock"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Initial Stock</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Initial Stock" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Initial Stock
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+                     <FormField
+                control={form.control}
+                name="inStock"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>InStock</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter available stock" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                     inStock
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit">Update Category</Button>
+            </form>
+          </Form>
+        </div>
+        : <div className="h-screen w-full flex justify-center items-center">
+          <Loader2 className="h-24 w-24 animate-spin" />
+        </div>}
+    </>
   )
 }

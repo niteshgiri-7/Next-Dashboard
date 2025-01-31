@@ -1,9 +1,11 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { eq } from "drizzle-orm"
 import { categories, products } from "@/app/lib/db/schema"
 import { db } from "@/app/lib/db"
 
-export async function GET(req: Request, { params }: { params: Record<string, string> }) {
+export async function GET(req: NextRequest) {
+  const  id  = req.nextUrl.pathname.split("/").pop()
+
   try {
     const product = await db
       .select({
@@ -17,7 +19,8 @@ export async function GET(req: Request, { params }: { params: Record<string, str
       })
       .from(products)
       .innerJoin(categories, eq(products.categoryId, categories.id))
-      .where(eq(products.id, Number(params.id)))
+      .where(eq(products.id, Number(id)))
+
     if (!product.length) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 })
     }
@@ -32,21 +35,23 @@ export async function GET(req: Request, { params }: { params: Record<string, str
   }
 }
 
-export async function PUT(req: Request, { params }: { params: Record<string, string> }) {
+export async function PUT(req: NextRequest) {
+  const id  = req.nextUrl.pathname.split("/").pop()
+
   try {
-    const { name, description, image, initialStock, inStock, categoryId } = await req.json();
+    const { name, description, image, initialStock, inStock, categoryId } = await req.json()
 
     if (!name || !description || !image || initialStock === undefined || inStock === undefined) {
       return NextResponse.json(
         { error: "All fields are required" },
         { status: 400 }
-      );
+      )
     }
 
     await db
       .update(products)
       .set({ name, description, image, initialStock, inStock, categoryId })
-      .where(eq(products.id, Number(params.id))) 
+      .where(eq(products.id, Number(id)))
 
     return NextResponse.json({ message: "Product updated successfully" })
   } catch (error) {
@@ -58,11 +63,13 @@ export async function PUT(req: Request, { params }: { params: Record<string, str
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: Record<string, string> }) {
+export async function DELETE(req: NextRequest) {
+  const  id  = req.nextUrl.pathname.split("/").pop()
+
   try {
     await db
       .delete(products)
-      .where(eq(products.id, Number(params.id)))
+      .where(eq(products.id, Number(id)))
 
     return NextResponse.json({ message: "Product deleted successfully" })
   } catch (error) {
